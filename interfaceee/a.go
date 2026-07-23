@@ -1,12 +1,12 @@
-package algorithm
+package interfaceee
 
 import (
 	"fmt"
 	"strings"
 )
 
-// simplePath 简化路径
-func simplePath() {
+// SimplePath 简化路径
+func SimplePath() {
 	s := "/a/b/c"
 	array := make([]string, 0)
 	fmt.Println(cap(array))
