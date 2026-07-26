@@ -5,5 +5,5 @@ import (
 )
 
 func main() {
-	interfaceee.SimplePath()
+	interfaceee.EvenOdd()
 }

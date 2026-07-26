@@ -3,6 +3,7 @@ package interfaceee
 import (
 	"fmt"
 	"strings"
+	"sync"
 	"time"
 )
 
@@ -56,4 +57,53 @@ func test(i int) {
 		fmt.Println("test", i)
 		time.Sleep(time.Minute)
 	}()
+}
+
+// evenOddItem 并发打印奇偶数
+type evenOddItem struct {
+	n             int
+	evenCh, oddCh chan struct{}
+	wg            *sync.WaitGroup
+}
+
+func (e *evenOddItem) odd() {
+	defer e.wg.Done()
+	for v := range e.n {
+		if (v+1)%2 == 0 {
+			<-e.oddCh
+			fmt.Println("odd", v+1)
+			e.evenCh <- struct{}{}
+		}
+	}
+}
+
+func (e *evenOddItem) even() {
+	defer e.wg.Done()
+	for v := range e.n {
+		if (v+1)%2 == 1 {
+			<-e.evenCh
+			fmt.Println("even", v+1)
+			if v+1 == e.n-1 {
+				return
+			}
+			e.oddCh <- struct{}{}
+		}
+	}
+}
+
+func EvenOdd() {
+	e := &evenOddItem{
+		wg:     &sync.WaitGroup{},
+		evenCh: make(chan struct{}),
+		oddCh:  make(chan struct{}),
+		n:      10,
+	}
+
+	e.wg.Add(2)
+
+	go e.odd()
+	go e.even()
+	e.oddCh <- struct{}{}
+
+	e.wg.Wait()
 }
