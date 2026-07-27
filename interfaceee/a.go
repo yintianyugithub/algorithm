@@ -1,6 +1,7 @@
 package interfaceee
 
 import (
+	"context"
 	"fmt"
 	"strings"
 	"sync"
@@ -108,6 +109,7 @@ func EvenOdd() {
 	e.wg.Wait()
 }
 
+// Candy 分发糖果
 func Candy(rating []int) int {
 	n := 0
 
@@ -138,4 +140,92 @@ func Candy(rating []int) int {
 	}
 
 	return n
+}
+
+// Mg 生产/消费者模型
+type Mg struct {
+	val     chan int
+	ctx     context.Context
+	workers chan struct{}
+}
+
+func (m *Mg) producer() {
+	idx := 0
+	for {
+		idx++
+		select {
+		case <-m.ctx.Done():
+			fmt.Println("producer done")
+			// 发送方明确通知发送完成，关闭channel
+			// close(m.val)
+			return
+		case m.val <- idx:
+		}
+	}
+}
+
+func (m *Mg) consumer() {
+	go func() {
+		for n := range m.val {
+			m.workers <- struct{}{}
+			go func() {
+				defer func() {
+					<-m.workers
+				}()
+				time.Sleep(time.Second)
+				fmt.Println("consumer", n)
+			}()
+		}
+	}()
+}
+
+func MgLaunch() {
+	mg := &Mg{
+		val:     make(chan int),
+		ctx:     context.TODO(),
+		workers: make(chan struct{}, 3),
+	}
+
+	ctx, cancel := context.WithTimeout(mg.ctx, time.Second*3)
+	defer cancel()
+	mg.ctx = ctx
+
+	go mg.producer()
+	mg.consumer()
+
+	select {
+	case <-mg.ctx.Done():
+		fmt.Println("main done")
+	}
+
+	time.Sleep(time.Second * 10)
+}
+
+// closedChannel 模拟协程关闭
+func closedChannel() {
+	ch := make(chan int)
+	go func() {
+		for i := 0; i < 5; i++ {
+			ch <- i
+		}
+		close(ch)
+	}()
+
+	// 协程关闭后可以接收，但range 会阻塞；需要开启协程，或发送方主动关闭channel
+	//go func() {
+	//	for v := range ch {
+	//		fmt.Println(v)
+	//	}
+	//}()
+
+	// 协程关闭后可以接收，接受对应类型的零值，但不能发送（此处开协程方便演示，否则循环一直接受0）
+	go func() {
+		for {
+			fmt.Println("for>", <-ch)
+		}
+	}()
+
+	time.Sleep(time.Microsecond * 100)
+	fmt.Println("done")
+
 }
