@@ -197,8 +197,6 @@ func MgLaunch() {
 	case <-mg.ctx.Done():
 		fmt.Println("main done")
 	}
-
-	time.Sleep(time.Second * 10)
 }
 
 // closedChannel 模拟协程关闭
@@ -228,4 +226,27 @@ func closedChannel() {
 	time.Sleep(time.Microsecond * 100)
 	fmt.Println("done")
 
+}
+
+func Trap() {
+	waters := []int{0, 1, 0, 2, 1, 0, 1, 3, 2, 1, 2, 1}
+	// 用左右两数组记录当前索引i在左右两边能达到的最大高度
+	l, r := make([]int, len(waters)), make([]int, len(waters))
+	for i := 1; i < len(l); i++ {
+		l[i] = max(l[i-1], waters[i-1])
+	}
+	for i := len(r) - 2; i >= 0; i-- {
+		r[i] = max(r[i+1], waters[i+1])
+	}
+
+	// 位置i能的最大水位是左右两边的最小水位，减去当前位置的高度就是当前位置的存水量
+	num := 0
+	for i, v := range waters {
+		m := min(l[i], r[i])
+		if m > v {
+			num += m - v
+		}
+	}
+
+	fmt.Println(num)
 }

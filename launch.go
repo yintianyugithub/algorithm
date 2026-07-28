@@ -1,3 +1,7 @@
 package main
 
-func main() {}
+import "interface/interfaceee"
+
+func main() {
+	interfaceee.Trap()
+}
