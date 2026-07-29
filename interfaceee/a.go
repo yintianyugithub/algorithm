@@ -228,6 +228,7 @@ func closedChannel() {
 
 }
 
+// Trap 接雨水
 func Trap() {
 	waters := []int{0, 1, 0, 2, 1, 0, 1, 3, 2, 1, 2, 1}
 	// 用左右两数组记录当前索引i在左右两边能达到的最大高度
@@ -249,4 +250,34 @@ func Trap() {
 	}
 
 	fmt.Println(num)
+}
+
+// MaximalSquare 最大正方形
+func MaximalSquare() {
+	// 核心思路：三者取最小，再加本身；i+1,j+1表示以i,j为右下角的最大正方形边长
+	matrix := [][]byte{
+		{'1', '0', '1', '0', '0'},
+		{'1', '0', '1', '1', '1'},
+		{'1', '1', '1', '1', '1'},
+		{'1', '0', '0', '1', '0'},
+	}
+
+	ans := 0
+	r, c := len(matrix), len(matrix[0])
+
+	dp := make([][]int, r+1)
+	for i := range dp {
+		dp[i] = make([]int, c+1)
+	}
+
+	for i, row := range matrix {
+		for j, v := range row {
+			if v == '1' {
+				dp[i+1][j+1] = min(dp[i][j], dp[i][j+1], dp[i+1][j]) + 1
+				ans = max(ans, dp[i+1][j+1])
+			}
+		}
+	}
+
+	fmt.Println(ans * ans)
 }

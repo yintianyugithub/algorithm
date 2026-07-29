@@ -3,5 +3,5 @@ package main
 import "interface/interfaceee"
 
 func main() {
-	interfaceee.Trap()
+	interfaceee.MaximalSquare()
 }
