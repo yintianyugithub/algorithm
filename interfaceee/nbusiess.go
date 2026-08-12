@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/redis/go-redis/v9"
+	"sync"
 )
 
 // stockScript lua脚本扣减库存
@@ -22,18 +23,23 @@ local remain = redis.call('DECRBY', KEYS[1], sub)
 return remain
 `
 
-var rdb *redis.Client
+var (
+	rdb  *redis.Client
+	once sync.Once
+)
 
 func initRedis() {
-	rdb = redis.NewClient(&redis.Options{
-		Addr:     "localhost:6379",
-		Password: "",
-		DB:       0,
-	})
+	once.Do(func() {
+		rdb = redis.NewClient(&redis.Options{
+			Addr:     "localhost:6379",
+			Password: "",
+			DB:       0,
+		})
 
-	if _, err := rdb.Ping(context.Background()).Result(); err != nil {
-		panic(err)
-	}
+		if _, err := rdb.Ping(context.Background()).Result(); err != nil {
+			panic(err)
+		}
+	})
 }
 
 func DeStock(key string, num int64) (int64, bool, error) {
