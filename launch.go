@@ -1,7 +1,10 @@
 package main
 
-import "interface/interfaceee"
+import (
+	"fmt"
+	"runtime"
+)
 
 func main() {
-	interfaceee.MaximalSquare()
+	fmt.Println(runtime.GOMAXPROCS(0))
 }
