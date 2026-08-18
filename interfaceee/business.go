@@ -45,7 +45,7 @@ func initRedis() {
 func DeStock(key string, num int64) (int64, bool, error) {
 	initRedis()
 
-	res, err := rdb.Eval(context.Background(), stockScript, []string{key}, []interface{}{10}).Result()
+	res, err := rdb.Eval(context.Background(), stockScript, []string{key}, []interface{}{num}).Result()
 	if err != nil {
 		return 0, false, err
 	}
