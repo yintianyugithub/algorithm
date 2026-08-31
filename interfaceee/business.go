@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"math/rand/v2"
+	"net"
 	"sort"
 	"strings"
 	"sync"
@@ -256,4 +257,61 @@ func CalculateLoginTime(ctx context.Context, uid int64) {
 	}
 
 	logx.WithContext(ctx).Infof("用户:%d登录时长%d秒", uid, loginTime)
+}
+
+// RedisSentinel redis哨兵
+func RedisSentinel() {
+	// 自定义拨号器，将容器内部地址映射到宿主机可达地址
+	customDialer := func(ctx context.Context, network, addr string) (net.Conn, error) {
+		// 如果检测到是容器内部地址，替换为宿主机映射地址
+		if addr == "172.20.0.12:6381" {
+			addr = "127.0.0.1:6381"
+		}
+		if addr == "172.20.0.11:6380" {
+			addr = "127.0.0.1:6380"
+		}
+		if addr == "172.20.0.10:6379" {
+			addr = "127.0.0.1:6379"
+		}
+		// 使用默认的 net.Dialer 进行实际连接
+		dialer := net.Dialer{
+			Timeout:   5 * time.Second,
+			KeepAlive: 30 * time.Second,
+		}
+		return dialer.DialContext(ctx, network, addr)
+	}
+
+	rdb := redis.NewFailoverClient(&redis.FailoverOptions{
+		MasterName:    "mymaster",
+		SentinelAddrs: []string{"127.0.0.1:26379", "127.0.0.1:26380", "127.0.0.1:26381"},
+		Dialer:        customDialer, // 注入自定义拨号器
+		// 其他必要配置（如超时）
+		DialTimeout:  5 * time.Second,
+		ReadTimeout:  3 * time.Second,
+		WriteTimeout: 3 * time.Second,
+	})
+
+	ctx := context.Background()
+	if err := rdb.Ping(ctx).Err(); err != nil {
+		logx.Errorf("连接失败: %v", err)
+		return
+	}
+	logx.Info("连接成功")
+
+	// 执行 Set/Get...
+	err := rdb.Set(ctx, "mykey", "value", 0).Err()
+	if err != nil {
+		logx.Errorf("SET 失败: %v", err)
+	} else {
+		logx.Info("SET 成功")
+	}
+
+	val, err := rdb.Get(ctx, "mykey").Result()
+	if errors.Is(err, redis.Nil) {
+		logx.Info("键不存在")
+	} else if err != nil {
+		logx.Errorf("GET 失败: %v", err)
+	} else {
+		logx.Infof("GET 结果: %s", val)
+	}
 }
