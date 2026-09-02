@@ -1,6 +1,7 @@
 package interfaceee
 
 import (
+	"container/list"
 	"context"
 	"fmt"
 	"strings"
@@ -280,4 +281,53 @@ func MaximalSquare() {
 	}
 
 	fmt.Println(ans * ans)
+}
+
+// Lru 缓存淘汰策略
+type Lru struct {
+	Cap   int
+	Cache map[string]*list.Element
+	List  *list.List
+}
+
+type LruItem struct {
+	K string
+	V string
+}
+
+func (l *Lru) get(k string) string {
+	if v, ok := l.Cache[k]; ok {
+		l.List.MoveToFront(v)
+		return v.Value.(*LruItem).V
+	}
+
+	return ""
+}
+
+func (l *Lru) set(k string, v string) {
+	setV := &LruItem{K: k, V: v}
+
+	if c, ok := l.Cache[k]; ok {
+		c.Value = setV
+		l.List.MoveToFront(c)
+		l.Cache[k] = c
+	} else {
+		l.Cache[k] = l.List.PushFront(setV)
+	}
+
+	if l.Cap < l.List.Len() {
+		back := l.List.Back()
+		if back != nil {
+			l.List.Remove(back)
+			delete(l.Cache, back.Value.(*LruItem).K)
+		}
+	}
+}
+
+func construct(cap int) *Lru {
+	return &Lru{
+		Cap:   cap,
+		List:  list.New(),
+		Cache: make(map[string]*list.Element),
+	}
 }
