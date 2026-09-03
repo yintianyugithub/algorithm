@@ -9,6 +9,33 @@ import (
 	"time"
 )
 
+type TreeNode struct {
+	L *TreeNode
+	R *TreeNode
+	V int
+}
+
+// LevelRange 层级遍历二叉树
+func LevelRange(root *TreeNode) {
+	if root == nil {
+		return
+	}
+
+	q := []*TreeNode{root}
+	for len(q) > 0 {
+		for _, v := range q {
+			q = q[1:]
+			fmt.Println(v.V)
+			if v.L != nil {
+				q = append(q, v.L)
+			}
+			if v.R != nil {
+				q = append(q, v.R)
+			}
+		}
+	}
+}
+
 // SimplePath 简化路径
 func SimplePath() {
 	s := "/a/b/c"
