@@ -9,7 +9,7 @@ local window = tonumber(ARGV[2])
 local now = tonumber(ARGV[3])
 redis.call("LPUSH", KEYS[1], now)
 local len = tonumber(redis.call("LLEN", KEYS[1]))
---redis.call("EXPIRE", KEYS[1], window / rate * 2)
+redis.call("EXPIRE", KEYS[1], window / rate * 2)
 local allow = true
 if len > rate then
     --redis.log(redis.LOG_WARNING, "alllow...", window)

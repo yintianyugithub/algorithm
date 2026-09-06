@@ -76,8 +76,8 @@ func GetAtkBuk() {
 	logx.Infof("%v,%v", res2, err)
 }
 
-// WindowAlgorithm 滑动窗口限流
-func WindowAlgorithm() {
+// WindowAlgorithmByList 滑动窗口限流 基于list实现
+func WindowAlgorithmByList() {
 	for i := range 11 {
 		res, err := DistributeLimiter.ScriptRun(windowScript, []string{"{test}.window"}, []any{10, 100, time.Now().Unix()})
 		if errors.Is(err, redis.Nil) {
@@ -88,6 +88,22 @@ func WindowAlgorithm() {
 			logx.Error(err)
 		} else {
 			logx.Infof("window algorithm_%d: %v", i, res.(int64))
+		}
+	}
+}
+
+// WindowAlgorithmByZSet 滑动窗口限流 基于ZSet实现 10req/s
+func WindowAlgorithmByZSet() {
+	for range 100 {
+		now := time.Now().UnixMilli()
+		key := "test"
+		_, _ = DistributeLimiter.Zadd(key, now, fmt.Sprintf("%d", now))
+		_, _ = DistributeLimiter.Zremrangebyscore(key, 0, now-1000)
+		count, _ := DistributeLimiter.Zcard(key)
+		if count > 10 {
+			logx.Error("429")
+		} else {
+			logx.Infof("%d", count)
 		}
 	}
 }
