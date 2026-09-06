@@ -31,19 +31,19 @@ return remain
 `
 
 var (
-	rdb  *redis.Client
+	Rdb  *redis.Client
 	once sync.Once
 )
 
 func initRedis() {
 	once.Do(func() {
-		rdb = redis.NewClient(&redis.Options{
+		Rdb = redis.NewClient(&redis.Options{
 			Addr:     "localhost:6379",
 			Password: "",
 			DB:       0,
 		})
 
-		if _, err := rdb.Ping(context.Background()).Result(); err != nil {
+		if _, err := Rdb.Ping(context.Background()).Result(); err != nil {
 			panic(err)
 		}
 	})
@@ -52,7 +52,7 @@ func initRedis() {
 func DeStock(key string, num int64) (int64, bool, error) {
 	initRedis()
 
-	res, err := rdb.Eval(context.Background(), stockScript, []string{key}, []any{num}).Result()
+	res, err := Rdb.Eval(context.Background(), stockScript, []string{key}, []any{num}).Result()
 	if err != nil {
 		return 0, false, err
 	}
@@ -292,14 +292,14 @@ func RedisSentinel() {
 	})
 
 	ctx := context.Background()
-	if err := rdb.Ping(ctx).Err(); err != nil {
+	if err := Rdb.Ping(ctx).Err(); err != nil {
 		logx.Errorf("连接失败: %v", err)
 		return
 	}
 	logx.Info("连接成功")
 
 	// 执行 Set/Get...
-	err := rdb.Set(ctx, "mykey", "value", 0).Err()
+	err := Rdb.Set(ctx, "mykey", "value", 0).Err()
 	if err != nil {
 		logx.Errorf("SET 失败: %v", err)
 	} else {
