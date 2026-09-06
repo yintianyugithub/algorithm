@@ -5,5 +5,5 @@ import (
 )
 
 func main() {
-	micro.WindowAlgorithmByZSet()
+	micro.WindowAlgorithmByList()
 }

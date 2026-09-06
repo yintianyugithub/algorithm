@@ -19,3 +19,43 @@ if len > rate then
     redis.call("RPOP", KEYS[1], len - rate)
 end
 return allow
+
+--上面的版本有毛刺问题：第一分钟最后一秒和第二分中第一秒
+--版本2
+--local key = KEYS[1]
+--
+--local now = tonumber(ARGV[1])
+--local window = tonumber(ARGV[2])
+--local limit = tonumber(ARGV[3])
+--
+--local min_time = now - window
+--
+---- 1. 删除过期请求
+--while true do
+--    local item = redis.call('LINDEX', key, 0)
+--
+--    if not item then
+--        break
+--    end
+--
+--    if tonumber(item) > min_time then
+--        break
+--    end
+--
+--    redis.call('LPOP', key)
+--end
+--
+---- 2. 判断当前窗口请求数
+--local count = redis.call('LLEN', key)
+--
+--if count >= limit then
+--    return 0
+--end
+--
+---- 3. 加入当前请求
+--redis.call('RPUSH', key, now)
+--
+---- 4. 设置过期时间
+--redis.call('PEXPIRE', key, window)
+--
+--return 1
