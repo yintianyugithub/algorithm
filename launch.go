@@ -5,5 +5,5 @@ import (
 )
 
 func main() {
-	micro.GetAtkBuk()
+	micro.WindowAlgorithm()
 }

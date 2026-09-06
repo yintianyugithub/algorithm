@@ -2,6 +2,7 @@ package micro
 
 import (
 	_ "embed"
+	"errors"
 	"fmt"
 	"sync"
 	"time"
@@ -23,8 +24,11 @@ var (
 	DistributeLimiter     *redis.Redis
 	DistributeLimiterOnce sync.Once
 	//go:embed token_buket.lua
-	TokenBuketAlgorithm string
-	tokenScript         = redis.NewScript(TokenBuketAlgorithm)
+	tokenBuketAlgorithm string
+	tokenScript         = redis.NewScript(tokenBuketAlgorithm)
+	//go:embed window_list.lua
+	windowAlgorithm string
+	windowScript    = redis.NewScript(windowAlgorithm)
 )
 
 func init() {
@@ -37,7 +41,7 @@ func init() {
 		if !DistributeLimiter.Ping() {
 			logx.Errorf("distribute redis fail")
 		} else {
-			logx.Infof("distribute redis success")
+			logx.Infof("Ping distribute redis success")
 		}
 	})
 }
@@ -50,12 +54,40 @@ func AtkBuket() {
 
 // GetAtkBuk 令牌桶算法
 func GetAtkBuk() {
-	res, err := DistributeLimiter.Eval(TokenBuketAlgorithm, []string{"{test}.tokens", "{test}.ms"}, []any{10, 1000, time.Now().Unix(), 1})
+	res, err := DistributeLimiter.Eval(tokenBuketAlgorithm, []string{"{test}.tokens", "{test}.ms"}, []any{10, 1000, time.Now().Unix(), 1})
+	// redis的bool类型，返回 nil
+	if errors.Is(err, redis.Nil) {
+		logx.Error("rsp 429")
+		return
+	}
 	if err != nil {
 		logx.Errorf("%v", err)
 	}
+
 	logx.Infof("%v", res)
 
 	res2, err := DistributeLimiter.ScriptRun(tokenScript, []string{"{test}.tokens", "{test}.ms"}, []any{10, 1000, time.Now().Unix(), 1})
+	// redis的bool类型，返回 nil
+	if errors.Is(err, redis.Nil) {
+		logx.Error("rsp 429")
+		return
+	}
+
 	logx.Infof("%v,%v", res2, err)
+}
+
+// WindowAlgorithm 滑动窗口限流
+func WindowAlgorithm() {
+	for i := range 11 {
+		res, err := DistributeLimiter.ScriptRun(windowScript, []string{"{test}.window"}, []any{10, 100, time.Now().Unix()})
+		if errors.Is(err, redis.Nil) {
+			logx.Errorf("%d:rsp 429", i)
+			continue
+		}
+		if err != nil {
+			logx.Error(err)
+		} else {
+			logx.Infof("window algorithm_%d: %v", i, res.(int64))
+		}
+	}
 }
