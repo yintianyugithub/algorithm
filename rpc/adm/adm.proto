@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package adm;
+option go_package="./adm";
+
+message Request {
+  string ping = 1;
+}
+
+message Response {
+  string pong = 1;
+}
+
+service Adm {
+  rpc Ping(Request) returns(Response);
+}

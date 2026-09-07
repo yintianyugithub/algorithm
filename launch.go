@@ -1,7 +1,7 @@
 package main
 
 import (
-	"interface/interfaceee/micro"
+	"algorithm/interfaceee/micro"
 )
 
 func main() {
