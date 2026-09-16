@@ -358,3 +358,73 @@ func construct(cap int) *Lru {
 		Cache: make(map[string]*list.Element),
 	}
 }
+
+// Do 并发处理任务，处理最先完成的；同时关闭其他任务
+func Do(ctx context.Context) {
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+
+	resultCh := make(chan result, 3)
+
+	tasks := []func(context.Context) (string, error){
+		task1,
+		task2,
+		task3,
+	}
+
+	for _, task := range tasks {
+		go func() {
+			d, e := task(ctx)
+			resultCh <- result{d, e}
+		}()
+	}
+
+	// 谁先完成谁返回
+	for range len(tasks) {
+		if v, ok := <-resultCh; ok {
+			fmt.Println(v.data)
+			if v.err != nil {
+				fmt.Println(v.err.Error())
+			}
+			cancel()
+		}
+	}
+}
+
+type result struct {
+	data string
+	err  error
+}
+
+func task1(ctx context.Context) (string, error) {
+	select {
+	case <-ctx.Done():
+		fmt.Println("done1")
+		return "", ctx.Err()
+	case <-time.After(time.Second):
+		fmt.Println("not done1")
+		return "task1", nil
+	}
+}
+
+func task2(ctx context.Context) (string, error) {
+	select {
+	case <-ctx.Done():
+		fmt.Println("done2")
+		return "", ctx.Err()
+	case <-time.Tick(2 * time.Second):
+		fmt.Println("not done2")
+		return "task2", nil
+	}
+}
+
+func task3(ctx context.Context) (string, error) {
+	select {
+	case <-ctx.Done():
+		fmt.Println("done3")
+		return "", ctx.Err()
+	case <-time.Tick(3 * time.Second):
+		fmt.Println("not done3")
+		return "task3", nil
+	}
+}
