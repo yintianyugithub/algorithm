@@ -428,3 +428,18 @@ func task3(ctx context.Context) (string, error) {
 		return "task3", nil
 	}
 }
+
+// FindCommonParent 寻找二叉树最近的公共祖先
+func FindCommonParent(root, node1, node2 *TreeNode) *TreeNode {
+	if root == nil || node1 == root || node2 == root {
+		return root
+	}
+
+	l, r := FindCommonParent(root.L, node1, node2), FindCommonParent(root.R, node1, node2)
+
+	if l != nil {
+		return l
+	}
+
+	return r
+}
