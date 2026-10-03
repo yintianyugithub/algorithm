@@ -443,3 +443,38 @@ func FindCommonParent(root, node1, node2 *TreeNode) *TreeNode {
 
 	return r
 }
+
+// NumIslands 岛屿数量
+func NumIslands(grid [][]byte) int {
+	if len(grid) == 0 {
+		return 0
+	}
+
+	var count int
+	row, col := len(grid), len(grid[0])
+
+	var dfs func(i, j int)
+	dfs = func(i, j int) {
+		if i < 0 || i >= row || j < 0 || j >= col || grid[i][j] == '0' {
+			return
+		}
+
+		grid[i][j] = '0'
+
+		dfs(i-1, j)
+		dfs(i+1, j)
+		dfs(i, j-1)
+		dfs(i, j+1)
+	}
+
+	for i := 0; i < row; i++ {
+		for j := 0; j < col; j++ {
+			if grid[i][j] == '1' {
+				count++
+				dfs(i, j)
+			}
+		}
+	}
+
+	return count
+}
