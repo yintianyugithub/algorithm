@@ -561,3 +561,47 @@ func numIslands(graph *Graph) *Graph {
 
 	return dfs(graph)
 }
+
+// CanFinish 课程表：本质是有向图是否有环
+// 找到依赖自己的课程
+// 定义三转态：0未开始 1进行中 2已完成 ，DFS寻找依赖自己的课程：遇到1是环，遇到2返回true，
+func CanFinish(numClass int, prerequires [][]int) bool {
+	grap := make([][]int, numClass)
+	for _, p := range prerequires {
+		a, b := p[0], p[1]
+		grap[b] = append(grap[b], a)
+	}
+
+	state := make([]int, numClass)
+
+	var dfs func(int) bool
+	dfs = func(x int) bool {
+		if state[x] == 1 {
+			return false
+		}
+
+		if state[x] == 2 {
+			return true
+		}
+
+		state[x] = 1
+
+		for _, v := range grap[x] {
+			if !dfs(v) {
+				return false
+			}
+		}
+
+		state[x] = 2
+
+		return true
+	}
+
+	for i := 0; i < numClass; i++ {
+		if !dfs(i) {
+			return false
+		}
+	}
+
+	return true
+}
