@@ -467,8 +467,8 @@ func NumIslands(grid [][]byte) int {
 		dfs(i, j+1)
 	}
 
-	for i := 0; i < row; i++ {
-		for j := 0; j < col; j++ {
+	for i := range row {
+		for j := range col {
 			if grid[i][j] == '1' {
 				count++
 				dfs(i, j)
@@ -477,4 +477,87 @@ func NumIslands(grid [][]byte) int {
 	}
 
 	return count
+}
+
+// 被包围的区域
+func solve(board [][]byte) {
+	// 用DFS标记四条边O的所有可达节点成#
+	// DFS边界条件是：越界或节点不是O
+	// 遍历二维表格剩下的O改成X,#改成O
+
+	if len(board) == 0 {
+		return
+	}
+
+	row, col := len(board), len(board[0])
+
+	var dfs func(board [][]byte, i, j int)
+	dfs = func(board [][]byte, i, j int) {
+		if i < 0 || i >= row || j < 0 || j >= col || board[i][j] != 'O' {
+			return
+		}
+
+		board[i][j] = '#'
+
+		dfs(board, i-1, j)
+		dfs(board, i+1, j)
+		dfs(board, i, j+1)
+		dfs(board, i, j-1)
+	}
+
+	for i := 0; i < row; i++ {
+		dfs(board, i, 0)
+		dfs(board, i, col-1)
+	}
+
+	for j := 0; j < col; j++ {
+		dfs(board, 0, j)
+		dfs(board, row-1, j)
+	}
+
+	for i := 0; i < row; i++ {
+		for j := 0; j < col; j++ {
+			if board[i][j] == 'O' {
+				board[i][j] = 'X'
+			} else if board[i][j] == '#' {
+				board[i][j] = 'O'
+			}
+		}
+	}
+}
+
+type Graph struct {
+	Val       int
+	Neighbors []*Graph
+}
+
+// 克隆图
+func numIslands(graph *Graph) *Graph {
+	// 用hashMap记录已经被克隆的节点
+	// 用DFS克隆节点的相邻节点
+
+	if graph == nil {
+		return graph
+	}
+
+	visited := make(map[*Graph]*Graph)
+	var dfs func(graph *Graph) *Graph
+	dfs = func(graph *Graph) *Graph {
+		if clone, ok := visited[graph]; ok {
+			return clone
+		}
+
+		visited[graph] = graph
+		clone := &Graph{
+			Val: graph.Val,
+		}
+
+		for _, neighbor := range graph.Neighbors {
+			clone.Neighbors = append(clone.Neighbors, dfs(neighbor))
+		}
+
+		return clone
+	}
+
+	return dfs(graph)
 }
