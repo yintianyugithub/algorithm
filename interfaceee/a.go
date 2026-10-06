@@ -597,11 +597,63 @@ func CanFinish(numClass int, prerequires [][]int) bool {
 		return true
 	}
 
-	for i := 0; i < numClass; i++ {
+	for i := range numClass {
 		if !dfs(i) {
 			return false
 		}
 	}
 
 	return true
+}
+
+// MinMutation 最小基因变化
+func MinMutation(startGene string, endGene string, bank []string) int {
+	bankSet := make(map[string]bool)
+	for _, b := range bank {
+		bankSet[b] = true
+	}
+
+	if !bankSet[endGene] {
+		return -1
+	}
+
+	visited := map[string]bool{
+		startGene: true,
+	}
+
+	queue := []string{startGene}
+	step := 0
+	genes := []byte{'A', 'C', 'G', 'T'}
+
+	for len(queue) > 0 {
+		size := len(queue)
+		for range size {
+			cur := queue[0]
+			queue = queue[1:]
+
+			if cur == endGene {
+				return step
+			}
+
+			bytes := []byte(cur)
+			for j := range len(bytes) {
+				old := bytes[j]
+				for _, gene := range genes {
+					if old == gene {
+						continue
+					}
+					bytes[j] = gene
+					next := string(bytes)
+					if bankSet[next] && !visited[next] {
+						queue = append(queue, next)
+						visited[next] = true
+					}
+				}
+				bytes[j] = old
+			}
+		}
+		step++
+	}
+
+	return -1
 }
