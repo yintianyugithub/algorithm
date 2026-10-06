@@ -657,3 +657,45 @@ func MinMutation(startGene string, endGene string, bank []string) int {
 
 	return -1
 }
+
+// LetterCombination 电话号码的组合
+func LetterCombination(number string) []string {
+	if number == "" {
+		return nil
+	}
+
+	var (
+		path []byte
+		res  []string
+	)
+
+	phone := map[byte]string{
+		'2': "abc",
+		'3': "def",
+		'4': "ghi",
+		'5': "jkl",
+		'6': "mno",
+		'7': "pqrs",
+		'8': "tuv",
+		'9': "wxyz",
+	}
+
+	var backTrack func(idx int)
+	backTrack = func(idx int) {
+		if idx == len(number) {
+			res = append(res, string(path))
+			return
+		}
+
+		letters := phone[number[idx]]
+		for _, letter := range letters {
+			path = append(path, byte(letter)) // 做选择
+			backTrack(idx + 1)                // 进入下一层
+			path = path[:len(path)-1]         //撤销选择
+		}
+	}
+
+	backTrack(0)
+
+	return res
+}
