@@ -699,3 +699,46 @@ func LetterCombination(number string) []string {
 
 	return res
 }
+
+// 单词搜索
+// DFS+回溯
+func wordSearch(board [][]byte, word string) bool {
+	if len(board) == 0 || len(word) == 0 {
+		return false
+	}
+
+	m, n := len(board), len(board[0])
+
+	var dfs func(i, j int, idx int) bool
+	dfs = func(i, j int, idx int) bool {
+		if idx == len(word) {
+			return true
+		}
+
+		if i < 0 || i >= m || j < 0 || j >= n {
+			return false
+		}
+
+		if board[i][j] != word[idx] {
+			return false
+		}
+
+		old := board[i][j]
+		board[i][j] = '#'
+
+		found := dfs(i-1, j, idx+1) || dfs(i+1, j, idx+1) || dfs(i, j-1, idx+1) || dfs(i, j+1, idx+1)
+
+		board[i][j] = old
+		return found
+	}
+
+	for i := range m {
+		for j := range n {
+			if dfs(i, j, 0) {
+				return true
+			}
+		}
+	}
+
+	return false
+}
