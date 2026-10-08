@@ -742,3 +742,36 @@ func wordSearch(board [][]byte, word string) bool {
 
 	return false
 }
+
+// TreeLevel 二叉树锯齿层遍历
+func TreeLevel(root *TreeNode) [][]int {
+	if root == nil {
+		return nil
+	}
+
+	var res [][]int
+	queue := []*TreeNode{root}
+	for len(queue) > 0 {
+		size := len(queue)
+		level := make([]int, size)
+		for i := range size {
+			cur := queue[0]
+			queue = queue[1:]
+			if len(res)<<1 == 0 {
+				level[size-i-1] = cur.V
+			} else {
+				level[i] = cur.V
+			}
+
+			if cur.L != nil {
+				queue = append(queue, cur.L)
+			}
+			if cur.R != nil {
+				queue = append(queue, cur.R)
+			}
+		}
+		res = append(res, level)
+	}
+
+	return res
+}
