@@ -128,3 +128,51 @@ func RandomCopy(root *ListNode) *ListNode {
 
 	return dummy.Next
 }
+
+// DeleteListN 删除链表倒数第N个节点
+func DeleteListN(head *ListNode, num int) *ListNode {
+	if head == nil || num == 0 {
+		return nil
+	}
+
+	dummy := &ListNode{Next: head}
+	l, r := dummy, dummy
+	for range num {
+		r = r.Next
+	}
+	for r.Next != nil {
+		l, r = l.Next, r.Next
+	}
+
+	l.Next = r.Next.Next
+
+	return dummy.Next
+}
+
+// ReserveList2 反转链表2
+func ReserveList2(head *ListNode, l, r int) *ListNode {
+	if head == nil || l > r {
+		return nil
+	}
+
+	dummy := &ListNode{Next: head}
+	tail := dummy
+
+	for range l - 1 {
+		tail = tail.Next
+	}
+
+	var pre, cur *ListNode = nil, tail.Next
+
+	for range r - l + 1 {
+		next := cur.Next
+		cur.Next = pre
+		pre = cur
+		cur = next
+	}
+
+	tail.Next.Next = cur
+	tail.Next = pre
+
+	return dummy.Next
+}
