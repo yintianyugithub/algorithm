@@ -757,7 +757,7 @@ func TreeLevel(root *TreeNode) [][]int {
 		for i := range size {
 			cur := queue[0]
 			queue = queue[1:]
-			if len(res)<<1 == 0 {
+			if len(res)%2 == 0 {
 				level[size-i-1] = cur.V
 			} else {
 				level[i] = cur.V
