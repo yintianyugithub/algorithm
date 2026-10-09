@@ -176,3 +176,55 @@ func ReserveList2(head *ListNode, l, r int) *ListNode {
 
 	return dummy.Next
 }
+
+// DeleteDuplication 删除链表重复元素
+func DeleteDuplication(head *ListNode) *ListNode {
+	if head == nil || head.Next == nil {
+		return nil
+	}
+
+	dummy := &ListNode{Next: head}
+	pre := dummy
+
+	for pre.Next != nil && pre.Next.Next != nil {
+		v := pre.Next.Val
+		if v == pre.Next.Next.Val {
+			for pre.Next != nil && pre.Next.Val == v {
+				pre.Next = pre.Next.Next
+			}
+		} else {
+			pre = pre.Next
+		}
+	}
+
+	return dummy.Next
+}
+
+// rotateRight 旋转链表，把链表向右移动K个位置
+func rotateRight(head *ListNode, k int) *ListNode {
+	if head == nil || head.Next == nil {
+		return nil
+	}
+
+	n := 1
+	cur := head
+	for cur.Next != nil {
+		cur = cur.Next
+		n++
+	}
+
+	if n%k == 0 {
+		return head
+	}
+
+	dummy := head
+	for range n - k - 1 {
+		dummy = dummy.Next
+	}
+
+	res := dummy.Next
+	dummy.Next = cur.Next
+	cur.Next = head
+
+	return res
+}
