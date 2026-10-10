@@ -228,3 +228,30 @@ func rotateRight(head *ListNode, k int) *ListNode {
 
 	return res
 }
+
+// PartitionList 分隔链表 把所有小于X的节点放在比大于等于X节点的左侧：保持原始位置不变
+func PartitionList(head *ListNode, x int) *ListNode {
+	if head == nil {
+		return head
+	}
+
+	l, r := &ListNode{}, &ListNode{}
+	dl, dr := l, r
+	cur := head
+	for cur != nil {
+		if cur.Val >= x {
+			dr.Next = cur
+			dr = dr.Next
+		} else {
+			dl.Next = cur
+			dr = dl.Next
+		}
+
+		cur = cur.Next
+	}
+
+	dl.Next = r.Next
+	dr.Next = nil
+
+	return l.Next
+}
