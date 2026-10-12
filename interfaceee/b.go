@@ -2,6 +2,8 @@ package interfaceee
 
 import (
 	"fmt"
+	"math"
+	"sort"
 	"strconv"
 	"strings"
 )
@@ -344,4 +346,63 @@ func summaryRanges(nums []int) []string {
 	}
 
 	return res
+}
+
+// insertInterval 插入区间
+func insertInterval(intervals [][]int, newInterval []int) [][]int {
+	intervals = append(intervals, newInterval)
+
+	sort.Slice(intervals, func(i, j int) bool {
+		return intervals[i][0] < intervals[j][0]
+	})
+
+	merged := make([][]int, 0)
+	for _, v := range intervals {
+		if len(merged) == 0 || merged[len(merged)-1][1] < v[0] {
+			merged = append(merged, v)
+		} else {
+			merged[len(merged)-1][1] = max(merged[len(merged)-1][1], v[1])
+		}
+	}
+
+	return merged
+}
+
+// mergeInterval合并区间
+func mergeInterval(intervals [][]int) [][]int {
+
+	sort.Slice(intervals, func(a, b int) bool {
+		return intervals[a][0] < intervals[b][0]
+	})
+
+	merged := make([][]int, 0)
+	for _, v := range intervals {
+		if len(merged) == 0 || merged[len(merged)-1][1] < v[0] {
+			merged = append(merged, v)
+		} else {
+			merged[len(merged)-1][1] = max(merged[len(merged)-1][1], v[1])
+		}
+	}
+
+	return merged
+}
+
+// latest 最少的箭引爆气球数
+func latest(points [][]int) int {
+	if len(points) < 2 {
+		return len(points)
+	}
+	sort.Slice(points, func(a, b int) bool {
+		return points[a][1] < points[b][1]
+	})
+
+	ans, start := 0, math.MinInt64
+	for _, v := range points {
+		if v[0] > start {
+			ans++
+			start = v[1]
+		}
+	}
+
+	return ans
 }
