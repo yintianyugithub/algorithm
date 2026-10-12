@@ -1,5 +1,11 @@
 package interfaceee
 
+import (
+	"fmt"
+	"strconv"
+	"strings"
+)
+
 // sliceToBST 升序数组转成平衡二叉树
 func sliceToBST(sorted []int) *TreeNode {
 	if len(sorted) == 0 {
@@ -254,4 +260,88 @@ func PartitionList(head *ListNode, x int) *ListNode {
 	dr.Next = nil
 
 	return l.Next
+}
+
+// splitWord 反转字符串中的单词，不允许用split
+func splitWord(s string) string {
+	if s == "" {
+		return s
+	}
+
+	s = strings.TrimLeft(s, "#")
+	s = strings.TrimRight(s, "#")
+
+	worldSlice := make([]string, 0)
+	start := 0
+
+	for i, v := range s {
+		if v == '#' {
+			worldSlice = append(worldSlice, s[start:i])
+			start = i + 1
+		}
+	}
+
+	worldSlice = append(worldSlice, s[start:])
+
+	res := ""
+	for i := len(worldSlice) - 1; i >= 0; i-- {
+		if worldSlice[i] == "" {
+			continue
+		}
+		res = fmt.Sprintf("%s#%s", res, worldSlice[i])
+	}
+
+	res = strings.TrimLeft(res, "#")
+
+	return res
+}
+
+// MostNumber 多数元素
+func MostNumber(nums []int) int {
+	if len(nums) == 0 {
+		return 0
+	}
+
+	k, cnt := nums[0], 1
+	for _, v := range nums[1:] {
+		if cnt == 0 {
+			cnt = v
+		}
+
+		if v == k {
+			cnt++
+		} else {
+			cnt--
+		}
+	}
+
+	return k
+}
+
+// summaryRanges 汇总区间
+func summaryRanges(nums []int) []string {
+	if len(nums) == 0 {
+		return nil
+	}
+
+	res := make([]string, 0, len(nums))
+	start := nums[0]
+	for i := 1; i < len(nums); i++ {
+		if nums[i-1] != nums[i]-1 {
+			if start == nums[i-1] {
+				res = append(res, strconv.Itoa(nums[i-1]))
+			} else {
+				res = append(res, fmt.Sprintf("%d->%d", start, nums[i-1]))
+			}
+			start = nums[i]
+		}
+	}
+
+	if start == nums[len(nums)-1] {
+		res = append(res, strconv.Itoa(start))
+	} else {
+		res = append(res, fmt.Sprintf("%d->%d", start, nums[len(nums)-1]))
+	}
+
+	return res
 }
