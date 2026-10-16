@@ -6,6 +6,7 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+	"unicode"
 )
 
 // sliceToBST 升序数组转成平衡二叉树
@@ -405,4 +406,126 @@ func latest(points [][]int) int {
 	}
 
 	return ans
+}
+
+// TowSum 两数之和
+func TowSum(nums []int, target int) []int {
+	if len(nums) == 0 {
+		return nil
+	}
+
+	l, r := 0, len(nums)-1
+
+	for l < r {
+		v := nums[l] + nums[r]
+		if v == target {
+			return []int{l + 1, r + 1}
+		} else if v < target {
+			r--
+		} else {
+			l++
+		}
+	}
+
+	return nil
+}
+
+// ThreeSum 三数之和
+func ThreeSum(nums []int) [][]int {
+	if len(nums) < 3 {
+		return nil
+	}
+
+	sort.Ints(nums)
+	res := make([][]int, 0)
+	for i := 0; i < len(nums)-2; i++ {
+		if nums[i] > 0 {
+			break
+		}
+		if i > 0 && nums[i] == nums[i-1] {
+			continue
+		}
+
+		l, r := i+1, len(nums)-1
+		for l < r {
+			v := nums[l] + nums[r] + nums[i]
+			if v == 0 {
+				res = append(res, []int{nums[i], nums[l], nums[r]})
+				for l < r && nums[l] == nums[l+1] {
+					l++
+				}
+				for l < r && nums[r] == nums[r-1] {
+					r--
+				}
+				l++
+				r--
+			} else if v > 0 {
+				r--
+			} else {
+				l++
+			}
+		}
+	}
+
+	return res
+}
+
+// MaxArea 盛最多水的容器
+func MaxArea(nums []int) int {
+	if len(nums) == 0 {
+		return 0
+	}
+
+	l, r := 0, len(nums)-1
+	area := 0
+	for l < r {
+		if v := (r - l) * min(nums[l], nums[r]); v > area {
+			area = v
+		}
+		if nums[l] < nums[r] {
+			l++
+		} else {
+			r--
+		}
+	}
+
+	return area
+}
+
+// IsHui 验证回文子串
+func IsHui(s string) bool {
+	tmp := make([]rune, 0, len(s))
+	for _, v := range s {
+		if unicode.IsLetter(v) || unicode.IsDigit(v) {
+			tmp = append(tmp, unicode.ToLower(v))
+		}
+	}
+
+	for i, j := 0, len(tmp)-1; i < j; i, j = i+1, j-1 {
+		if tmp[i] != tmp[j] {
+			return false
+		}
+	}
+
+	return true
+}
+
+// SubStr 判断子序列
+func SubStr(s, t string) bool {
+	if s == "" {
+		return true
+	}
+
+	i := 0
+	for _, v := range t {
+		if byte(v) == s[i] {
+			i++
+		}
+
+		if i == len(s)-1 {
+			return true
+		}
+	}
+
+	return false
 }
