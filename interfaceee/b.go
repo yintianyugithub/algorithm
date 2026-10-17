@@ -529,3 +529,48 @@ func SubStr(s, t string) bool {
 
 	return false
 }
+
+// MinSubArr 长度最小的子数组
+func MinSubArr(nums []int, target int) int {
+	if len(nums) == 0 {
+		return 0
+	}
+
+	sum, l, ml := 0, 0, len(nums)+1
+	for r, v := range nums {
+		sum += v
+		for sum >= target {
+			if r-l+1 < ml {
+				ml = r - l + 1
+			}
+			sum -= nums[l]
+			l++
+		}
+	}
+
+	if ml == len(nums)+1 {
+		return 0
+	}
+
+	return ml
+}
+
+// NoRepeatLongestStr 无重复最长子串
+func NoRepeatLongestStr(s string) int {
+	if len(s) == 0 {
+		return 0
+	}
+
+	l, repeat, ml := 0, make(map[rune]int, len(s)), 0
+	for r, v := range s {
+		if idx, ok := repeat[v]; ok && idx >= l {
+			l = idx + 1
+		}
+		if r-l+1 > ml {
+			ml = r - l + 1
+		}
+		repeat[v] = r
+	}
+
+	return ml
+}
