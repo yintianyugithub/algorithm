@@ -659,7 +659,6 @@ func MinCoverSubStr(s, t string) string {
 }
 
 // LongestPalindrome 最长回文子串
-
 func LongestPalindrome(s string) string {
 	n := len(s)
 	if n == 0 {
@@ -678,4 +677,18 @@ func LongestPalindrome(s string) string {
 	}
 
 	return s[ansL:ansR]
+}
+
+// minimumTotal 三角形最小路径和
+func minimumTotal(triangle [][]int) int {
+	if len(triangle) == 0 || len(triangle[0]) == 0 {
+		return 0
+	}
+	for i := len(triangle) - 2; i >= 0; i-- {
+		for j := range triangle[i] {
+			triangle[i][j] += triangle[i+1][j] + triangle[i+1][j+1]
+		}
+	}
+
+	return triangle[0][0]
 }
