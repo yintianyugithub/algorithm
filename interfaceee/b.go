@@ -609,7 +609,7 @@ func CoverWordsSubStr(s string, words []string) []int {
 					res = append(res, l)
 				}
 			} else {
-				need = make(map[string]int)
+				win = make(map[string]int)
 				appearCnt = 0
 				l = r + wordLen
 			}
@@ -656,4 +656,26 @@ func MinCoverSubStr(s, t string) string {
 	}
 
 	return s[start : start+mLen]
+}
+
+// LongestPalindrome 最长回文子串
+
+func LongestPalindrome(s string) string {
+	n := len(s)
+	if n == 0 {
+		return ""
+	}
+	ansL, ansR := 0, 0
+	for i := range 2*n - 1 {
+		l, r := i/2, (i+1)/2
+		for l >= 0 && r < n && s[l] == s[r] {
+			l--
+			r++
+		}
+		if r-l-1 > ansR-ansL {
+			ansL, ansR = l+1, r
+		}
+	}
+
+	return s[ansL:ansR]
 }
