@@ -574,3 +574,86 @@ func NoRepeatLongestStr(s string) int {
 
 	return ml
 }
+
+// CoverWordsSubStr 覆盖所有单词的子串
+func CoverWordsSubStr(s string, words []string) []int {
+	if s == "" || len(words) == 0 {
+		return nil
+	}
+
+	wordCnt := len(words)
+	wordLen := len(words[0])
+	need := make(map[string]int)
+	for _, v := range words {
+		need[v]++
+	}
+
+	res := make([]int, 0)
+	for i := range wordLen {
+		appearCnt := 0
+		l := i
+		win := make(map[string]int)
+		for r := l; r+wordLen <= len(s); r = r + wordLen {
+			word := s[r : r+wordLen]
+			if needCnt, ok := need[word]; ok {
+				appearCnt++
+				win[word]++
+				for win[word] > needCnt {
+					lWord := s[l : l+wordLen]
+					win[lWord]--
+					appearCnt--
+					l += wordLen
+				}
+
+				if appearCnt == wordCnt {
+					res = append(res, l)
+				}
+			} else {
+				need = make(map[string]int)
+				appearCnt = 0
+				l = r + wordLen
+			}
+		}
+	}
+
+	return res
+}
+
+// MinCoverSubStr 最小覆盖子串
+func MinCoverSubStr(s, t string) string {
+	if s == "" || t == "" {
+		return ""
+	}
+
+	l, mLen, start, need, require := 0, len(s)+1, 0, make(map[rune]int), 0
+	for _, v := range t {
+		need[v]++
+	}
+
+	sn := make(map[rune]int)
+	for r, v := range s {
+		sn[v]++
+		if need[v] > 0 && sn[v] == need[v] {
+			require++
+
+			for require == len(need) && l <= r {
+				if mLen > r-l+1 {
+					mLen = r - l + 1
+					start = l
+				}
+				lv := rune(s[l])
+				sn[lv]--
+				if need[lv] > 0 && sn[lv] < need[lv] {
+					require--
+				}
+				l++
+			}
+		}
+	}
+
+	if mLen == len(s)+1 {
+		return ""
+	}
+
+	return s[start : start+mLen]
+}

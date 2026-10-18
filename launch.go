@@ -1,9 +1,10 @@
 package main
 
 import (
-	"algorithm/interfaceee/micro"
+	"algorithm/interfaceee"
+	"fmt"
 )
 
 func main() {
-	micro.WindowAlgorithmByList()
+	fmt.Println(interfaceee.CoverWordsSubStr("aoaobobo", []string{"ao", "bo"}))
 }

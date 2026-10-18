@@ -31,7 +31,7 @@ var (
 	windowScript    = redis.NewScript(windowAlgorithm)
 )
 
-func init() {
+func initRedisAlone() {
 	DistributeLimiterOnce.Do(func() {
 		DistributeLimiter = redis.MustNewRedis(redis.RedisConf{
 			Host: "localhost:6379",

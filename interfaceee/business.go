@@ -93,7 +93,7 @@ var (
 	}
 )
 
-func init() {
+func initRedisCluster() {
 	RedisClusterDb(context.TODO())
 }
 
