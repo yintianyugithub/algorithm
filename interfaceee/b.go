@@ -756,3 +756,26 @@ func SetZeros(matrix [][]int) {
 		}
 	}
 }
+
+// MaxSquare 最大正方形
+func MaxSquare(matrix [][]byte) int {
+	if len(matrix) == 0 || len(matrix[0]) == 0 {
+		return 0
+	}
+	m, n := len(matrix), len(matrix[0])
+	ans := 0
+	dp := make([][]int, m+1)
+	for i := range dp {
+		dp[i] = make([]int, n+1)
+	}
+	for i := range m {
+		for j := range n {
+			if matrix[i][j] == '1' {
+				dp[i+1][j+1] = min(dp[i][j+1], dp[i][j], dp[i+1][j]) + 1
+				ans = max(ans, dp[i+1][j+1])
+			}
+		}
+	}
+
+	return ans * ans
+}
