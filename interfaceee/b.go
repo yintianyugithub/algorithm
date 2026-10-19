@@ -692,3 +692,67 @@ func minimumTotal(triangle [][]int) int {
 
 	return triangle[0][0]
 }
+
+// SetZeros 矩阵置零
+func SetZeros(matrix [][]int) {
+	if len(matrix) == 0 || len(matrix[0]) == 0 {
+		return
+	}
+
+	m, n := len(matrix), len(matrix[0])
+	row, col := false, false
+
+	// 首行
+	for j := range n {
+		if matrix[0][j] == 0 {
+			row = true
+			break
+		}
+	}
+
+	// 首列
+	for i := range m {
+		if matrix[i][0] == 0 {
+			col = true
+			break
+		}
+	}
+
+	for i := 1; i < m; i++ {
+		for j := 1; j < n; j++ {
+			if matrix[i][j] == 0 {
+				matrix[0][j] = 0 // 列
+				matrix[i][0] = 0 // 行
+			}
+		}
+	}
+	// 改行
+	for i := 1; i < m; i++ {
+		if matrix[i][0] == 0 {
+			for j := 1; j < n; j++ {
+				matrix[i][j] = 0
+			}
+		}
+	}
+
+	// 改列
+	for j := 1; j < n; j++ {
+		if matrix[0][j] == 0 {
+			for i := 1; i < m; i++ {
+				matrix[i][j] = 0
+			}
+		}
+	}
+	// 首行
+	if row {
+		for j := range n {
+			matrix[0][j] = 0
+		}
+	}
+	// 首列
+	if col {
+		for i := range m {
+			matrix[i][0] = 0
+		}
+	}
+}
