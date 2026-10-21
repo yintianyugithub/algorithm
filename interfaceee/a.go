@@ -137,39 +137,6 @@ func EvenOdd() {
 	e.wg.Wait()
 }
 
-// Candy 分发糖果
-func Candy(rating []int) int {
-	n := 0
-
-	if len(rating) == 0 {
-		return n
-	}
-
-	res := make([]int, len(rating))
-
-	for i := range res {
-		res[i] = 1
-	}
-
-	for i := 1; i < len(rating); i++ {
-		if rating[i] > rating[i-1] {
-			res[i] = res[i-1] + 1
-		}
-	}
-
-	for i := len(rating) - 2; i >= 0; i-- {
-		if rating[i] > rating[i+1] {
-			res[i] = max(res[i+1]+1, res[i])
-		}
-	}
-
-	for _, v := range res {
-		n += v
-	}
-
-	return n
-}
-
 // Mg 生产/消费者模型
 type Mg struct {
 	val     chan int
