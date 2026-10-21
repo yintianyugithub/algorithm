@@ -779,3 +779,79 @@ func MaxSquare(matrix [][]byte) int {
 
 	return ans * ans
 }
+
+// MinPathSum 最小路径和
+func MinPathSum(matrix [][]int) int {
+	if len(matrix) == 0 || len(matrix[0]) == 0 {
+		return 0
+	}
+
+	f, n := matrix[0], len(matrix[0])
+	for i := 1; i < n; i++ {
+		f[i] += f[i-1]
+	}
+
+	for i := 1; i < len(matrix); i++ {
+		f[0] += matrix[i][0]
+		for j := 1; j < n; j++ {
+			f[j] = min(f[j-1], f[j]) + matrix[i][j]
+		}
+	}
+
+	return f[n-1]
+}
+
+// Family 打家截舍
+func Family(nums []int) int {
+	if len(nums) == 0 {
+		return 0
+	}
+
+	if len(nums) == 1 {
+		return nums[0]
+	}
+
+	if len(nums) == 2 {
+		return max(nums[0], nums[1])
+	}
+
+	dp := make([]int, len(nums))
+	dp[0], dp[1] = nums[0], max(nums[0], nums[1])
+
+	for i := 2; i < len(nums); i++ {
+		dp[i] = max(dp[i-1], dp[i-2]+nums[i])
+	}
+
+	return dp[len(nums)-1]
+}
+
+// 分发糖果
+func candy(ratings []int) int {
+	n := 0
+	if len(ratings) == 0 {
+		return n
+	}
+
+	res := make([]int, len(ratings))
+	for i := range res {
+		res[i] = 1
+	}
+
+	for i := 1; i < len(ratings); i++ {
+		if ratings[i] > ratings[i-1] {
+			res[i] = res[i-1] + 1
+		}
+	}
+
+	for i := len(ratings) - 2; i >= 0; i-- {
+		if ratings[i] > ratings[i+1] {
+			res[i] = max(res[i+1]+1, res[i])
+		}
+	}
+
+	for _, v := range res {
+		n += v
+	}
+
+	return n
+}
