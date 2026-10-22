@@ -874,3 +874,27 @@ func SearchInsertPosition(nums []int, target int) int {
 
 	return l
 }
+
+// SearchMatrix 搜索二维表格
+func SearchMatrix(nums [][]int, target int) bool {
+	if len(nums) == 0 || len(nums[0]) == 0 {
+		return false
+	}
+
+	m, n := len(nums), len(nums[0])
+
+	l, r := 0, m*n-1
+	for l <= r {
+		mid := l + (r-l)/2
+		row, col := mid/n, mid%n
+		if nums[row][col] == target {
+			return true
+		} else if nums[row][col] > target {
+			r = mid - 1
+		} else {
+			l = mid + 1
+		}
+	}
+
+	return false
+}
