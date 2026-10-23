@@ -898,3 +898,97 @@ func SearchMatrix(nums [][]int, target int) bool {
 
 	return false
 }
+
+// MaxSumSub 子数组的最大和
+func MaxSumSub(nums []int) int {
+	if len(nums) == 0 {
+		return math.MinInt64
+	}
+	cur, ans := nums[0], nums[0]
+	for _, v := range nums[1:] {
+		if cur < 0 {
+			cur = v
+		} else {
+			cur += v
+		}
+		ans = max(ans, cur)
+	}
+
+	return ans
+}
+
+// CycleMaxSum 环形子数组的最大和
+// 最大值等于max(最大值总和，总值-最小值)
+// 最大值总和小于零直接返回最大值总和
+func CycleMaxSum(nums []int) int {
+	if len(nums) == 0 {
+		return math.MinInt64
+	}
+	total := 0
+	curMax, maxSum := nums[0], nums[0]
+	curMin, minSum := nums[0], nums[0]
+
+	for i, v := range nums {
+		total += v
+		if i == 0 {
+			continue
+		}
+		curMax = max(v, v+curMax)
+		maxSum = max(maxSum, curMax)
+		curMin = min(v, v+curMin)
+		minSum = min(minSum, curMin)
+	}
+
+	if maxSum < 0 {
+		return maxSum
+	}
+
+	return max(maxSum, total-minSum)
+}
+
+// ChineseToNumber 把汉字数字转成阿拉伯数字
+// 按亿分成两部分
+// cur记录个位，detection记录万以下，total记录万以上
+func ChineseToNumber(s string) int64 {
+	s = strings.TrimSpace(s)
+	if s == "" {
+		return 0
+	}
+
+	var (
+		numMpa = map[rune]int64{
+			'零': 0, '一': 1, '二': 2, '三': 3, '四': 4, '五': 5, '六': 6, '七': 7, '八': 8, '九': 9,
+		}
+		unitMap = map[rune]int64{
+			'十': 10, '百': 100, '千': 1000,
+		}
+		total     int64
+		cur       int64
+		detection int64
+	)
+	parse := func(s string) int64 {
+		for _, ch := range s {
+			if n, ok := numMpa[ch]; ok {
+				cur = n
+			}
+			if n, ok := unitMap[ch]; ok {
+				detection += cur * n
+				cur = 0
+			}
+			if ch == '万' {
+				total += (detection + cur) * 10000
+				detection = 0
+				cur = 0
+			}
+		}
+
+		return total + detection + cur
+	}
+
+	parts := strings.SplitN(s, "亿", 2)
+	if len(parts) != 2 {
+		return parse(s)
+	}
+
+	return parse(parts[0])*100000000 + parse(parts[1])
+}
