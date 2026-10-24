@@ -1091,3 +1091,67 @@ func findOrder(numCourses int, prerequisites [][]int) []int {
 
 	return order
 }
+
+// WordBreak 单词拆分
+// 单词映射成MAP
+// dp动态规划记录 dp[j] && dp[s[j:i]] 时记录i为true
+func WordBreak(s string, wordDict []string) bool {
+	n := len(s)
+	if n == 0 {
+		return true
+	}
+
+	wordMap := make(map[string]bool)
+	for _, w := range wordDict {
+		wordMap[w] = true
+	}
+	dp := make(map[int]bool, n+1)
+	dp[0] = true
+
+	for i := 1; i <= n; i++ {
+		for j := 0; j < i; j++ {
+			if dp[j] && wordMap[s[j:i]] {
+				dp[i] = true
+			}
+		}
+	}
+
+	return dp[n]
+}
+
+// CoinChange 零钱兑换
+// i是当前的金额：dp[i] = min(dp[i-coin]+1， dp[i])
+func CoinChange(money int, coins []int) int {
+	dp := make([]int, money+1)
+	for i := 1; i <= money; i++ {
+		dp[i] = money + 1
+	}
+
+	for i := 1; i <= money; i++ {
+		for _, coin := range coins {
+			if i >= coin && dp[i-coin] != money+1 {
+				dp[i] = min(dp[i], dp[i-coin]+1)
+			}
+		}
+	}
+
+	return dp[money]
+}
+
+// LongestIncreaseSub 最长自增子序列
+func LongestIncreaseSub(nums []int) int {
+	n := len(nums)
+	dp := make([]int, n)
+	ans := 0
+	for i := range n {
+		dp[i] = 1
+		for j := range i {
+			if nums[i] > nums[j] {
+				dp[i] = max(dp[i], dp[j]+1)
+			}
+		}
+		ans = max(ans, dp[i])
+	}
+
+	return ans
+}
