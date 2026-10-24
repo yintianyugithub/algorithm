@@ -531,7 +531,7 @@ func numIslands(graph *Graph) *Graph {
 
 // CanFinish 课程表：本质是有向图是否有环
 // 找到依赖自己的课程
-// 定义三转态：0未开始 1进行中 2已完成 ，DFS寻找依赖自己的课程：遇到1是环，遇到2返回true，
+// 定义三状态：0未开始 1进行中 2已完成 ，DFS寻找依赖自己的课程：遇到1是环，遇到2返回true，
 func CanFinish(numClass int, prerequires [][]int) bool {
 	grap := make([][]int, numClass)
 	for _, p := range prerequires {

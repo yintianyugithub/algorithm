@@ -992,3 +992,102 @@ func ChineseToNumber(s string) int64 {
 
 	return parse(parts[0])*100000000 + parse(parts[1])
 }
+
+// Calculation 除法求值
+// 构建带权重的正反图
+// dfs搜索，a->c经过边的乘积就是答案
+func Calculation(pre [][]string, values []float64, answers [][]string) []float64 {
+	graph := make(map[string]map[string]float64, len(pre)*2)
+	for i, p := range pre {
+		a, b := p[0], p[1]
+		if graph[a] == nil {
+			graph[a] = make(map[string]float64)
+		}
+		if graph[b] == nil {
+			graph[b] = make(map[string]float64)
+		}
+		graph[a][b] = values[i]
+		graph[b][a] = 1.0 / values[i]
+	}
+
+	var dfs func(start, end string, visited map[string]bool) float64
+	dfs = func(start, end string, visited map[string]bool) float64 {
+		if graph[start] == nil || graph[end] == nil {
+			return -1.0
+		}
+		if start == end {
+			return 1.0
+		}
+		visited[start] = true
+		for next, weight := range graph[start] {
+			if visited[next] {
+				continue
+			}
+			if nextW := dfs(next, end, visited); nextW != -1.0 {
+				return nextW * weight
+			}
+		}
+
+		return -1.0
+	}
+
+	res := make([]float64, len(answers))
+	for i, answer := range answers {
+		res[i] = dfs(answer[0], answer[1], make(map[string]bool))
+	}
+
+	return res
+}
+
+// findOrder 课程表2
+// 构建入度和被依赖，入度为零进入队列
+// 循环队列减掉被依赖课程的边，入队，记录结果
+func findOrder(numCourses int, prerequisites [][]int) []int {
+	// graph[a] 存储：学完 a 后可以学习哪些课程
+	graph := make([][]int, numCourses)
+
+	// indegree[i] 表示课程 i 还有多少门先修课程
+	indegree := make([]int, numCourses)
+
+	// 建图并统计入度
+	for _, p := range prerequisites {
+		course := p[0]
+		pre := p[1]
+
+		graph[pre] = append(graph[pre], course)
+		indegree[course]++
+	}
+
+	// 将所有入度为 0 的课程加入队列
+	queue := make([]int, 0, numCourses)
+	for i := 0; i < numCourses; i++ {
+		if indegree[i] == 0 {
+			queue = append(queue, i)
+		}
+	}
+
+	// 拓扑排序
+	order := make([]int, 0, numCourses)
+
+	for head := 0; head < len(queue); head++ {
+		course := queue[head]
+		order = append(order, course)
+
+		// 删除当前课程指向的所有边
+		for _, next := range graph[course] {
+			indegree[next]--
+
+			// 先修课程全部完成
+			if indegree[next] == 0 {
+				queue = append(queue, next)
+			}
+		}
+	}
+
+	// 如果没有遍历所有课程，说明存在环
+	if len(order) != numCourses {
+		return []int{}
+	}
+
+	return order
+}
