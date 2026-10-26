@@ -1255,3 +1255,79 @@ func ConstructFourTree(grid [][]int) *Node {
 
 	return build(0, 0, n)
 }
+
+// MergeKList 合并K个升序链表
+func MergeKList(lists []*ListNode) *ListNode {
+	if len(lists) == 0 {
+		return nil
+	}
+	if len(lists) == 1 {
+		return lists[0]
+	}
+
+	var mergeF func(l, r *ListNode) *ListNode
+	mergeF = func(l, r *ListNode) *ListNode {
+		dummy := &ListNode{}
+		cur := dummy
+		for l != nil && r != nil {
+			if l.Val <= r.Val {
+				cur.Next = l
+				l = l.Next
+			} else {
+				cur.Next = r
+				r = r.Next
+			}
+
+			cur = cur.Next
+		}
+
+		if l != nil {
+			cur.Next = l
+		} else if r != nil {
+			cur.Next = r
+		}
+
+		return dummy.Next
+	}
+
+	ans := lists[0]
+	for _, v := range lists[1:] {
+		ans = mergeF(ans, v)
+	}
+
+	return ans
+}
+
+// SearchMedianSortedArr 寻找两个正序数组的中位数
+func SearchMedianSortedArr(nums1, nums2 []int) float64 {
+	var mergeSortedArr func(nums1, nums2 []int) []int
+	mergeSortedArr = func(nums1, nums2 []int) []int {
+		res := make([]int, 0, len(nums1)+len(nums2))
+		i, j := 0, 0
+		for i < len(nums1) && j < len(nums2) {
+			if nums1[i] <= nums2[j] {
+				res = append(res, nums1[i])
+				i++
+			} else {
+				res = append(res, nums2[j])
+				j++
+			}
+		}
+
+		if i == len(nums1) {
+			res = append(res, nums2[j:]...)
+		} else {
+			res = append(res, nums1[i:]...)
+		}
+
+		return res
+	}
+
+	nums := mergeSortedArr(nums1, nums2)
+	mid := len(nums) >> 1
+	if len(nums)%2 == 0 {
+		return float64(nums[mid-1]+nums[mid]) / 2
+	}
+
+	return float64(nums[mid])
+}
