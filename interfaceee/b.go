@@ -1060,7 +1060,7 @@ func findOrder(numCourses int, prerequisites [][]int) []int {
 
 	// 将所有入度为 0 的课程加入队列
 	queue := make([]int, 0, numCourses)
-	for i := 0; i < numCourses; i++ {
+	for i := range numCourses {
 		if indegree[i] == 0 {
 			queue = append(queue, i)
 		}
@@ -1154,4 +1154,104 @@ func LongestIncreaseSub(nums []int) int {
 	}
 
 	return ans
+}
+
+// SortedList 排序链表
+func sortList(head *ListNode) *ListNode {
+	// 递归终止条件：空链表或只有一个节点
+	if head == nil || head.Next == nil {
+		return head
+	}
+
+	// 1. 快慢指针寻找中点
+	slow, fast := head, head.Next
+
+	for fast != nil && fast.Next != nil {
+		slow = slow.Next
+		fast = fast.Next.Next
+	}
+
+	// 2. 从中点断开链表
+	mid := slow.Next
+	slow.Next = nil
+
+	// 3. 分别对左右两部分排序
+	left := sortList(head)
+	right := sortList(mid)
+
+	// 4. 合并两个有序链表
+	return merge(left, right)
+}
+func merge(left, right *ListNode) *ListNode {
+	dummy := &ListNode{}
+	cur := dummy
+
+	for left != nil && right != nil {
+		if left.Val <= right.Val {
+			cur.Next = left
+			left = left.Next
+		} else {
+			cur.Next = right
+			right = right.Next
+		}
+		cur = cur.Next
+	}
+
+	// 接上剩余部分
+	if left != nil {
+		cur.Next = left
+	} else {
+		cur.Next = right
+	}
+
+	return dummy.Next
+}
+
+type Node struct {
+	Val         bool
+	IsLeaf      bool
+	TopLeft     *Node
+	TopRight    *Node
+	BottomLeft  *Node
+	BottomRight *Node
+}
+
+// ConstructFourTree 构建四叉树
+func ConstructFourTree(grid [][]int) *Node {
+	n := len(grid)
+	var build func(row, col, size int) *Node
+	build = func(row, col, size int) *Node {
+		// 判断当前区域是否所有值都相同
+		val := grid[row][col]
+		uniform := true
+
+		for i := row; i < row+size && uniform; i++ {
+			for j := col; j < col+size; j++ {
+				if grid[i][j] != val {
+					uniform = false
+					break
+				}
+			}
+		}
+
+		if uniform {
+			return &Node{
+				Val:    val == 1,
+				IsLeaf: true,
+			}
+		}
+
+		half := size / 2
+
+		return &Node{
+			Val:         true, // 非叶子节点的值不影响结果
+			IsLeaf:      false,
+			TopLeft:     build(row, col, half),
+			TopRight:    build(row, col+half, half),
+			BottomLeft:  build(row+half, col, half),
+			BottomRight: build(row+half, col+half, half),
+		}
+	}
+
+	return build(0, 0, n)
 }
