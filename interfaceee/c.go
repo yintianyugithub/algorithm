@@ -1,5 +1,7 @@
 package interfaceee
 
+import "strings"
+
 // FindPeak 寻找峰值
 func FindPeak(nums []int) int {
 	if len(nums) == 0 {
@@ -106,4 +108,31 @@ func FindMin(nums []int) int {
 	}
 
 	return nums[l]
+}
+
+// AddBinary 二进制字符串相加
+// 和字符串整数逐位相加一样
+func AddBinary(a, b string) string {
+	i, j, carry := len(a)-1, len(b)-1, 0
+	var buildStr strings.Builder
+	for i >= 0 || j >= 0 || carry > 0 {
+		sum := carry
+		if i >= 0 {
+			sum += int(a[i] - '0')
+			i--
+		}
+		if j >= 0 {
+			sum += int(b[j] - '0')
+			j--
+		}
+		buildStr.WriteRune(rune('0' + sum%10))
+		carry = sum / 10
+	}
+
+	res := []rune(buildStr.String())
+	for l, r := 0, len(res)-1; l < r; l, r = l+1, r-1 {
+		res[l], res[r] = res[r], res[l]
+	}
+
+	return string(res)
 }
