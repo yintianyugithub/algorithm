@@ -1,6 +1,9 @@
 package interfaceee
 
-import "strings"
+import (
+	"strconv"
+	"strings"
+)
 
 // FindPeak 寻找峰值
 func FindPeak(nums []int) int {
@@ -135,4 +138,81 @@ func AddBinary(a, b string) string {
 	}
 
 	return string(res)
+}
+
+// ReverseBit 颠倒二进制位
+// 取数字的最后一位，res向左移动一位腾出位置(最后一位一定是0)
+// 把取出的最后一位，放在res的最右边(0|1、0|0)
+// 最后数字向右移动一位
+func ReverseBit(n int) int {
+	var res int
+
+	for range 32 {
+		res = (res << 1) | (n & 1)
+		n >>= 1
+	}
+
+	return res
+}
+
+// hammingWeight 位1的个数
+func hammingWeight(n int) int {
+	s := strconv.FormatInt(int64(n), 2)
+	ans := 0
+	for _, v := range s {
+		if v == 1+'0' {
+			ans++
+		}
+	}
+	return ans
+}
+
+// FindAppearFirstNumber 只出现一次的数字
+func FindAppearFirstNumber(nums []int) int {
+	var ans int
+
+	for _, v := range nums {
+		ans ^= v
+	}
+
+	return ans
+}
+
+// Oil 加油站
+func Oil(nums []int, oils []int) int {
+	rest, minRest, start := 0, 0, 0
+
+	for i, v := range nums {
+		rest += oils[i] - v
+		if rest < minRest {
+			minRest = rest
+			start = i
+		}
+	}
+
+	if rest >= 0 {
+		return start
+	}
+
+	return -1
+}
+
+// FindAppearFirstNumber2 只出现一次的数字2
+// 统计第i位是1的次数(出现三次的数字%3==0)、%3!=0的是出现一次的数字(把对应i位设置成1)
+func FindAppearFirstNumber2(nums []int) int {
+	var ans int
+
+	for i := range strconv.IntSize {
+		cnt := 0
+		for _, v := range nums {
+			if v>>i&1 == 1 {
+				cnt++
+			}
+		}
+		if cnt%3 != 0 {
+			ans |= 1 << i
+		}
+	}
+
+	return ans
 }
