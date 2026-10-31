@@ -216,3 +216,23 @@ func FindAppearFirstNumber2(nums []int) int {
 
 	return ans
 }
+
+// ExceptSelf 除自身外数组的乘积
+// 先算i左边的数乘积
+// 再算i右边数的乘积，左右相乘就是结果
+func ExceptSelf(nums []int) []int {
+	res := make([]int, len(nums))
+	res[0] = 1
+
+	for i := 1; i < len(nums); i++ {
+		res[i] = res[i-1] * nums[i-1]
+	}
+
+	r := 1
+	for i := len(nums) - 1; i >= 0; i-- {
+		res[i] *= r
+		r *= nums[i]
+	}
+
+	return res
+}
