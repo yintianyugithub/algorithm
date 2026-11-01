@@ -236,3 +236,36 @@ func ExceptSelf(nums []int) []int {
 
 	return res
 }
+
+// LongestConsecutive 最长连续序列
+func LongestConsecutive(nums []int) int {
+	// 先找到最小的数字
+	// 从最小的数字累加
+	// 长度大于从长度一半时停止
+	if len(nums) == 0 {
+		return 0
+	}
+
+	ans, m := 1, make(map[int]bool)
+	for _, v := range nums {
+		m[v] = true
+	}
+
+	for _, v := range nums {
+		if m[v-1] {
+			continue
+		}
+
+		increase := v + 1
+		for m[increase] {
+			increase++
+		}
+
+		ans = max(ans, increase-v)
+		if ans*2 >= len(nums) {
+			break
+		}
+	}
+
+	return ans
+}
