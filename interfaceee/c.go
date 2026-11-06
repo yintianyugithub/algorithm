@@ -1,6 +1,7 @@
 package interfaceee
 
 import (
+	"container/heap"
 	"strconv"
 	"strings"
 )
@@ -268,4 +269,68 @@ func LongestConsecutive(nums []int) int {
 	}
 
 	return ans
+}
+
+type pair struct {
+	i, j int
+	sum  int
+}
+
+// MinHeap 小根堆(最小堆)堆顶最小 TopK问题：比对顶的值大才有资格进入堆
+// 大根堆：堆顶最大，比堆顶小才有资格进入
+type MinHeap []pair
+
+func (m *MinHeap) Len() int {
+	return len(*m)
+}
+
+func (m *MinHeap) Less(i, j int) bool {
+	// 如果求TopK是不是换成 (*m)[i].sum < (*m)[j].sum 就可以了
+	return (*m)[i].sum < (*m)[j].sum
+}
+
+func (m *MinHeap) Swap(i, j int) {
+	(*m)[i], (*m)[j] = (*m)[j], (*m)[i]
+}
+
+func (m *MinHeap) Push(x any) {
+	*m = append(*m, x.(pair))
+}
+
+func (m *MinHeap) Pop() any {
+	x := (*m)[len(*m)-1]
+	*m = (*m)[:len(*m)-1]
+	return x
+}
+
+func FindKPairNumber(nums1 []int, nums2 []int, k int) [][]int {
+	if len(nums1) == 0 || len(nums2) == 0 || k == 0 {
+		return nil
+	}
+
+	minHap := &MinHeap{}
+	for i, num := range nums1 {
+		heap.Push(minHap, pair{
+			i:   i,
+			j:   0,
+			sum: num + nums2[0],
+		})
+	}
+
+	res := make([][]int, 0, k)
+	for k > 0 && minHap.Len() > 0 {
+		cur := heap.Pop(minHap).(pair)
+		res = append(res, []int{nums1[cur.i], nums2[cur.j]})
+		next := cur.j + 1
+		if next < len(nums2) {
+			heap.Push(minHap, pair{
+				i:   cur.i,
+				j:   next,
+				sum: nums1[cur.i] + nums2[next],
+			})
+		}
+		k--
+	}
+
+	return res
 }
