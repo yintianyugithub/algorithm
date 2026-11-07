@@ -334,3 +334,52 @@ func FindKPairNumber(nums1 []int, nums2 []int, k int) [][]int {
 
 	return res
 }
+
+// SnakesAndLadders 蛇形梯
+func SnakesAndLadders(board [][]int) int {
+	n := len(board)
+	target := n * n
+	getPosition := func(s int) (int, int) {
+		rowBottom := (s - 1) / n
+		col := (s - 1) % n
+		row := n - 1 - rowBottom
+		if rowBottom%2 == 1 {
+			col = n - 1 - col
+		}
+
+		return row, col
+	}
+
+	visited := make([]bool, target+1)
+	visited[1] = true
+	queue := []int{1}
+
+	steps := 0
+
+	for len(queue) > 0 {
+		for _, cur := range queue {
+			queue = queue[1:]
+			if cur == target {
+				return steps
+			}
+			for i := 1; i <= 6; i++ {
+				next := cur + i
+				if next > target {
+					break
+				}
+				row, col := getPosition(next)
+				if board[row][col] != -1 {
+					next = board[row][col]
+				}
+				if visited[next] {
+					continue
+				}
+				visited[next] = true
+				queue = append(queue, next)
+			}
+		}
+
+	}
+
+	return -1
+}
