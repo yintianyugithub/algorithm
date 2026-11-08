@@ -383,3 +383,91 @@ func SnakesAndLadders(board [][]int) int {
 
 	return -1
 }
+
+// Trie 前缀树
+type Trie struct {
+	Children [26]*Trie
+	IsEnd    bool
+}
+
+func ConstructorTrie() Trie {
+	return Trie{}
+}
+
+func (t *Trie) Insert(word string) {
+	cur := t
+	for _, ch := range word {
+		idx := ch - 'a'
+		if cur.Children[idx] == nil {
+			cur.Children[idx] = &Trie{}
+		}
+		cur = cur.Children[idx]
+	}
+	cur.IsEnd = true
+}
+
+func (t *Trie) Search(word string) bool {
+	cur := t
+	for _, ch := range word {
+		idx := ch - 'a'
+		if cur.Children[idx] == nil {
+			return false
+		}
+		cur = cur.Children[idx]
+	}
+
+	return cur.IsEnd
+}
+
+func (t *Trie) StartsWith(prefix string) bool {
+	cur := t
+	for _, ch := range prefix {
+		idx := ch - 'a'
+		if cur.Children[idx] == nil {
+			return false
+		}
+		cur = cur.Children[idx]
+	}
+
+	return true
+}
+
+// AddSearchWord 设计数据结构添加和搜索单词
+
+func (t *Trie) AddWord(word string) {
+	cur := t
+	for _, w := range word {
+		idx := w - 'a'
+		if cur.Children[idx] == nil {
+			cur.Children[idx] = &Trie{}
+		}
+		cur = cur.Children[idx]
+	}
+	cur.IsEnd = true
+}
+
+func (t *Trie) SearchWord(word string) bool {
+	var dfs func(cur *Trie, idx int) bool
+	dfs = func(cur *Trie, idx int) bool {
+		if idx == len(word) {
+			return cur.IsEnd
+		}
+		v := word[idx]
+		if v != '.' {
+			pos := v - 'a'
+			if cur.Children[pos] == nil {
+				return false
+			}
+			return dfs(cur.Children[pos], idx+1)
+		}
+		for _, child := range cur.Children {
+			if child != nil && dfs(child, idx+1) {
+				return true
+			}
+		}
+
+		return false
+	}
+
+	return dfs(t, 0)
+}
