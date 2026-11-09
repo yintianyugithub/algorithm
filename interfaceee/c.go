@@ -2,6 +2,7 @@ package interfaceee
 
 import (
 	"container/heap"
+	"sort"
 	"strconv"
 	"strings"
 )
@@ -473,7 +474,6 @@ func (t *Trie) SearchWord(word string) bool {
 }
 
 // Combine 组合
-
 func Combine(n, k int) [][]int {
 	var (
 		res       [][]int
@@ -496,6 +496,75 @@ func Combine(n, k int) [][]int {
 	}
 
 	backtrack(1)
+
+	return res
+}
+
+// Permute 全排列：数组的所有可能的组合
+func Permute(nums []int) [][]int {
+	var (
+		res       [][]int
+		path      []int
+		used      = make([]bool, len(nums))
+		backtrack func()
+	)
+
+	backtrack = func() {
+		if len(path) == len(nums) {
+			tmp := make([]int, len(path))
+			copy(tmp, path)
+			res = append(res, tmp)
+			return
+		}
+		for i, v := range nums {
+			if used[i] {
+				continue
+			}
+
+			used[i] = true
+
+			path = append(path, v)
+			backtrack()
+			path = path[:len(path)-1]
+
+			used[i] = false
+		}
+	}
+
+	backtrack()
+
+	return res
+}
+
+// CombinationSum 组合总和
+func CombinationSum(candidates []int, target int) [][]int {
+	var (
+		res       [][]int
+		path      []int
+		backtrack func(start, sum int)
+	)
+
+	sort.Ints(candidates)
+
+	backtrack = func(start, sum int) {
+		if sum == target {
+			tmp := make([]int, len(path))
+			copy(tmp, path)
+			res = append(res, tmp)
+			return
+		}
+
+		for i := start; i < len(candidates); i++ {
+			if sum+candidates[i] > target {
+				continue
+			}
+			path = append(path, candidates[i])
+			backtrack(i, sum+candidates[i])
+			path = path[:len(path)-1]
+		}
+	}
+
+	backtrack(0, 0)
 
 	return res
 }
