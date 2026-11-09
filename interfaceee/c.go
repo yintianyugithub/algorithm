@@ -568,3 +568,11 @@ func CombinationSum(candidates []int, target int) [][]int {
 
 	return res
 }
+
+// RangeBitwiseAnd 数字范围按位与
+func RangeBitwiseAnd(left int, right int) int {
+	for left < right {
+		right &= right - 1
+	}
+	return right
+}
